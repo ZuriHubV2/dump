@@ -1,7 +1,7 @@
 -- Load Ash-Libs
 local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/BloodLetters/Ash-Libs/refs/heads/main/source.lua"))()
 
--- Create main window with custom title/subtitle and hidden default controls
+-- Create main window with hidden default controls
 GUI:CreateMain({
     Name = "Grow A Garden Spawner",
     title = "YT: ZuriScripts",
@@ -21,7 +21,7 @@ GUI:CreateMain({
     HideWindowControls = true
 })
 
--- Access the window frame to add custom buttons
+-- Access window frame to add custom buttons
 local windowFrame = GUI._MainFrame
 
 -- Close button
@@ -61,13 +61,21 @@ end)
 --==============================
 local spawnerTab = GUI:CreateTab("Spawner", "home")
 
--- Make the tab scrollable
-if spawnerTab._Frame then
-    spawnerTab._Frame.ClipsDescendants = false
-    spawnerTab._Frame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-end
+-- Create a scrolling frame inside the tab
+local scrollingFrame = Instance.new("ScrollingFrame")
+scrollingFrame.Size = UDim2.new(1, -20, 1, -40)
+scrollingFrame.Position = UDim2.new(0, 10, 0, 30)
+scrollingFrame.BackgroundTransparency = 1
+scrollingFrame.ScrollBarThickness = 10
+scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+scrollingFrame.Parent = spawnerTab._Frame
 
-GUI:CreateSection({ parent = spawnerTab, text = "Pet Spawner" })
+local layout = Instance.new("UIListLayout")
+layout.SortOrder = Enum.SortOrder.LayoutOrder
+layout.Padding = UDim.new(0, 5)
+layout.Parent = scrollingFrame
+
+GUI:CreateSection({ parent = scrollingFrame, text = "Pet Spawner" })
 
 -- Load Grow A Garden spawner
 local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkdark/dark/-/raw/main/Spawner.lua"))()
@@ -75,56 +83,53 @@ local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkdark/dark/-/raw/
 local petWeight = 1
 local petAge = 2
 
--- Pet Weight & Age Inputs
-GUI:CreateInput({
-    parent = spawnerTab,
-    text = "Pet Weight (KG)",
-    placeholder = "Enter weight in KG",
-    callback = function(value)
-        local num = tonumber(value)
-        if num and num > 0 then
-            petWeight = num
-        else
-            GUI:CreateNotify({ title = "Invalid Value", description = "Weight must be a number greater than 0." })
-        end
-    end
-})
+-- Input helper
+local function createInput(text, placeholder, callback)
+    return GUI:CreateInput({
+        parent = scrollingFrame,
+        text = text,
+        placeholder = placeholder,
+        callback = callback
+    })
+end
 
-GUI:CreateInput({
-    parent = spawnerTab,
-    text = "Pet Age",
-    placeholder = "Enter pet age",
-    callback = function(value)
-        local num = tonumber(value)
-        if num and num > 0 then
-            petAge = num
-        else
-            GUI:CreateNotify({ title = "Invalid Value", description = "Age must be a number greater than 0." })
-        end
+createInput("Pet Weight (KG)", "Enter weight in KG", function(value)
+    local num = tonumber(value)
+    if num and num > 0 then petWeight = num else
+        GUI:CreateNotify({title = "Invalid Value", description = "Weight must be > 0"})
     end
-})
+end)
 
--- Spawn Pet Buttons (delayed for mobile rendering)
-task.delay(0.05, function()
+createInput("Pet Age", "Enter pet age", function(value)
+    local num = tonumber(value)
+    if num and num > 0 then petAge = num else
+        GUI:CreateNotify({title = "Invalid Value", description = "Age must be > 0"})
+    end
+end)
+
+-- Spawn pet buttons
+task.spawn(function()
     local pets = Spawner.GetPets()
-    table.sort(pets, function(a, b) return a:lower() < b:lower() end)
+    table.sort(pets, function(a,b) return a:lower() < b:lower() end)
     for _, pet in ipairs(pets) do
         GUI:CreateButton({
-            parent = spawnerTab,
-            text = "Spawn " .. pet,
+            parent = scrollingFrame,
+            text = "Spawn "..pet,
             callback = function()
                 Spawner.SpawnPet(pet, petWeight, petAge)
                 GUI:CreateNotify({
-                    title = "Pet Spawned",
-                    description = pet .. " has been spawned! Weight: " .. petWeight .. " | Age: " .. petAge
+                    title="Pet Spawned",
+                    description=pet.." has been spawned! Weight:"..petWeight.." | Age:"..petAge
                 })
             end
         })
     end
+    -- Update canvas size after adding buttons
+    scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, layout.AbsoluteContentSize.Y + 10)
 end)
 
 --==============================
--- Placeholder Tabs with Icons
+-- Placeholder Tabs
 --==============================
 local placeholderTabs = {
     {name = "Egg Randomizer", icon = "egg"},
@@ -133,14 +138,10 @@ local placeholderTabs = {
 
 for _, tabData in ipairs(placeholderTabs) do
     local tab = GUI:CreateTab(tabData.name, tabData.icon)
-    GUI:CreateSection({
-        parent = tab,
-        text = "Under Maintenance..."
-    })
+    GUI:CreateSection({ parent = tab, text = "Under Maintenance..." })
     GUI:CreateParagraph({
         parent = tab,
         text = "Join Discord for updates",
         alignment = Enum.TextXAlignment.Center
     })
 end
-
