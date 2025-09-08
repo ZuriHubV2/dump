@@ -34,7 +34,6 @@ closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
 closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.BorderSizePixel = 0
 closeButton.Parent = windowFrame
-
 closeButton.MouseButton1Click:Connect(function()
     windowFrame.Visible = false
 end)
@@ -49,7 +48,6 @@ minimizeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 minimizeButton.BorderSizePixel = 0
 minimizeButton.Parent = windowFrame
-
 minimizeButton.MouseButton1Click:Connect(function()
     for _, child in ipairs(windowFrame:GetChildren()) do
         if child ~= minimizeButton and child ~= closeButton and child:IsA("GuiObject") then
@@ -59,15 +57,21 @@ minimizeButton.MouseButton1Click:Connect(function()
 end)
 
 --==============================
--- Spawner Tab
+-- Spawner Tab (Mobile-Friendly)
 --==============================
 local spawnerTab = GUI:CreateTab("Spawner", "home")
+
+-- Make the tab scrollable
+if spawnerTab._Frame then
+    spawnerTab._Frame.ClipsDescendants = false
+    spawnerTab._Frame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+end
+
 GUI:CreateSection({ parent = spawnerTab, text = "Pet Spawner" })
 
 -- Load Grow A Garden spawner
 local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkdark/dark/-/raw/main/Spawner.lua"))()
 
--- Default pet values
 local petWeight = 1
 local petAge = 2
 
@@ -100,23 +104,24 @@ GUI:CreateInput({
     end
 })
 
--- Spawn Pets Buttons
-local pets = Spawner.GetPets()
-table.sort(pets, function(a, b) return a:lower() < b:lower() end)
-
-for _, pet in ipairs(pets) do
-    GUI:CreateButton({
-        parent = spawnerTab,
-        text = "Spawn " .. pet,
-        callback = function()
-            Spawner.SpawnPet(pet, petWeight, petAge)
-            GUI:CreateNotify({
-                title = "Pet Spawned",
-                description = pet .. " has been spawned! Weight: " .. petWeight .. " | Age: " .. petAge
-            })
-        end
-    })
-end
+-- Spawn Pet Buttons (delayed for mobile rendering)
+task.delay(0.05, function()
+    local pets = Spawner.GetPets()
+    table.sort(pets, function(a, b) return a:lower() < b:lower() end)
+    for _, pet in ipairs(pets) do
+        GUI:CreateButton({
+            parent = spawnerTab,
+            text = "Spawn " .. pet,
+            callback = function()
+                Spawner.SpawnPet(pet, petWeight, petAge)
+                GUI:CreateNotify({
+                    title = "Pet Spawned",
+                    description = pet .. " has been spawned! Weight: " .. petWeight .. " | Age: " .. petAge
+                })
+            end
+        })
+    end
+end)
 
 --==============================
 -- Placeholder Tabs with Icons
@@ -138,3 +143,4 @@ for _, tabData in ipairs(placeholderTabs) do
         alignment = Enum.TextXAlignment.Center
     })
 end
+
