@@ -1,10 +1,10 @@
 -- Load Ash-Libs
 local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/BloodLetters/Ash-Libs/refs/heads/main/source.lua"))()
 
--- Create the main window with custom title and subtitle
+-- Create main window
 GUI:CreateMain({
-    Name = "Grow A Garden Spawner", -- Main window title
-    title = "YT: ZuriScripts",      -- Subtitle text
+    Name = "Grow A Garden Spawner",
+    title = "YT: ZuriScripts",
     ToggleUI = "K",
     WindowIcon = "home",
     Theme = {
@@ -62,23 +62,25 @@ GUI:CreateInput({
     end
 })
 
--- Spawn Pets Buttons
-local pets = Spawner.GetPets()
-table.sort(pets, function(a, b) return a:lower() < b:lower() end)
+-- Spawn Pets Buttons (delayed for mobile rendering)
+task.defer(function()
+    local pets = Spawner.GetPets()
+    table.sort(pets, function(a, b) return a:lower() < b:lower() end)
 
-for _, pet in ipairs(pets) do
-    GUI:CreateButton({
-        parent = spawnerTab,
-        text = "Spawn " .. pet,
-        callback = function()
-            Spawner.SpawnPet(pet, petWeight, petAge)
-            GUI:CreateNotify({
-                title = "Pet Spawned",
-                description = pet .. " has been spawned! Weight: " .. petWeight .. " | Age: " .. petAge
-            })
-        end
-    })
-end
+    for _, pet in ipairs(pets) do
+        GUI:CreateButton({
+            parent = spawnerTab,
+            text = "Spawn " .. pet,
+            callback = function()
+                Spawner.SpawnPet(pet, petWeight, petAge)
+                GUI:CreateNotify({
+                    title = "Pet Spawned",
+                    description = pet .. " has been spawned! Weight: " .. petWeight .. " | Age: " .. petAge
+                })
+            end
+        })
+    end
+end)
 
 --==============================
 -- Placeholder Tabs with Icons
