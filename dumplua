@@ -1,21 +1,4 @@
---==============================
--- Load the Loading Screen
---==============================
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
--- Load the loading screen
-pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/ZuriHubV2/Loading/refs/heads/main/lua_screen"))()
-end)
-
--- Wait a safe amount of time for the loading screen to finish
--- 2-3 seconds is usually enough; adjust if your loading screen takes longer
-task.wait(6.5) 
-
---==============================
--- Load Ash-Libs GUI (Grow A Garden Spawner)
---==============================
+-- Load Ash-Libs
 local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/BloodLetters/Ash-Libs/refs/heads/main/source.lua"))()
 
 -- Create main window
@@ -44,7 +27,7 @@ local spawnerTab = GUI:CreateTab("Spawner", "home")
 GUI:CreateSection({ parent = spawnerTab, text = "Pet Spawner" })
 
 -- Load Grow A Garden spawner
-local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/ZuriHubV2/dump/refs/heads/main/dumplua"))()
+local Spawner = loadstring(game:HttpGet("https://gitlab.com/darkdark/dark/-/raw/main/Spawner.lua"))()
 
 -- Default pet values
 local petWeight = 1
@@ -79,7 +62,7 @@ GUI:CreateInput({
     end
 })
 
--- Spawn Pets Buttons (deferred for mobile)
+-- Spawn Pets Buttons (delayed for mobile rendering)
 task.defer(function()
     local pets = Spawner.GetPets()
     table.sort(pets, function(a, b) return a:lower() < b:lower() end)
@@ -100,19 +83,24 @@ task.defer(function()
 end)
 
 --==============================
--- Placeholder Tabs (Egg & Mutation)
+-- Placeholder Tabs with Icons
 --==============================
 local placeholderTabs = {
     {name = "Egg Randomizer", icon = "egg"},
-    {name = "Mutation Randomizer", icon = "testtube"}
+    {name = "Mutation Randomizer", icon = "test-tube"}
 }
 
 for _, tabData in ipairs(placeholderTabs) do
     local tab = GUI:CreateTab(tabData.name, tabData.icon)
-    GUI:CreateSection({ parent = tab, text = "Under Maintenance..." })
+    -- Main maintenance message
+    GUI:CreateSection({
+        parent = tab,
+        text = "Under Maintenance..."
+    })
+    -- Centered Discord info
     GUI:CreateParagraph({
         parent = tab,
-        text = "Join Discord for updates",
+        text = "Join Discord for updates:\nhttps://discord.gg/3J98QxVB",
         alignment = Enum.TextXAlignment.Center
     })
 end
