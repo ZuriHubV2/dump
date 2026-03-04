@@ -1,0 +1,250 @@
+-- Zuri MM2 Item Spawner - Polished Custom UI v2 (Smoothed Corners/Edges)
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local LocalPlayer = Players.LocalPlayer
+
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "ZuriMM2Spawner"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 340, 0, 240)
+MainFrame.Position = UDim2.new(0.5, -170, 0.5, -120)
+MainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 24)
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 16)
+UICorner.Parent = MainFrame
+
+-- Softer outer glow (reduced thickness, higher transparency)
+local OuterStroke = Instance.new("UIStroke")
+OuterStroke.Color = Color3.fromRGB(0, 120, 255)
+OuterStroke.Thickness = 2.5
+OuterStroke.Transparency = 0.7
+OuterStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+OuterStroke.Parent = MainFrame
+
+local InnerStroke = Instance.new("UIStroke")
+InnerStroke.Color = Color3.fromRGB(60, 160, 255)
+InnerStroke.Thickness = 1.2
+InnerStroke.Transparency = 0.35
+InnerStroke.Parent = MainFrame
+
+-- Title Bar
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 45)
+TitleBar.BackgroundColor3 = Color3.fromRGB(28, 28, 38)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainFrame
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, -90, 1, 0)
+TitleLabel.Position = UDim2.new(0, 16, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "Zuri MM2 Item Spawner"
+TitleLabel.TextColor3 = Color3.fromRGB(230, 230, 255)
+TitleLabel.TextSize = 20
+TitleLabel.Font = Enum.Font.GothamBlack
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = TitleBar
+
+-- Minimize Button (smoothed: larger radius, inset position, no sharp overlap)
+local MinimizeButton = Instance.new("TextButton")
+MinimizeButton.Size = UDim2.new(0, 32, 0, 32)
+MinimizeButton.Position = UDim2.new(1, -40, 0, 6)  -- slight inset
+MinimizeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+MinimizeButton.Text = "−"
+MinimizeButton.TextColor3 = Color3.new(1,1,1)
+MinimizeButton.Font = Enum.Font.GothamBold
+MinimizeButton.TextSize = 24
+MinimizeButton.Parent = TitleBar
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 12)  -- increased to match better
+MinCorner.Parent = MinimizeButton
+
+-- Input Field
+local ItemInput = Instance.new("TextBox")
+ItemInput.Size = UDim2.new(0.88, 0, 0, 45)
+ItemInput.Position = UDim2.new(0.06, 0, 0.24, 0)
+ItemInput.BackgroundColor3 = Color3.fromRGB(32, 32, 42)
+ItemInput.BorderSizePixel = 0
+ItemInput.Text = ""
+ItemInput.PlaceholderText = "e.g. Sweet"
+ItemInput.PlaceholderColor3 = Color3.fromRGB(150, 150, 170)
+ItemInput.TextColor3 = Color3.new(1,1,1)
+ItemInput.TextSize = 17
+ItemInput.Font = Enum.Font.GothamSemibold
+ItemInput.ClearTextOnFocus = false
+ItemInput.Parent = MainFrame
+
+local InputCorner = Instance.new("UICorner")
+InputCorner.CornerRadius = UDim.new(0, 12)
+InputCorner.Parent = ItemInput
+
+local InputStroke = Instance.new("UIStroke")
+InputStroke.Color = Color3.fromRGB(90, 90, 120)
+InputStroke.Thickness = 2
+InputStroke.Transparency = 0.45
+InputStroke.Parent = ItemInput
+
+-- Spawn Button
+local SpawnButton = Instance.new("TextButton")
+SpawnButton.Size = UDim2.new(0.88, 0, 0, 55)
+SpawnButton.Position = UDim2.new(0.06, 0, 0.52, 0)
+SpawnButton.BackgroundColor3 = Color3.fromRGB(30, 110, 255)
+SpawnButton.BorderSizePixel = 0
+SpawnButton.Text = "Spawn Item"
+SpawnButton.TextColor3 = Color3.new(1,1,1)
+SpawnButton.Font = Enum.Font.GothamBold
+SpawnButton.TextSize = 20
+SpawnButton.Parent = MainFrame
+
+local ButtonCorner = Instance.new("UICorner")
+ButtonCorner.CornerRadius = UDim.new(0, 12)
+ButtonCorner.Parent = SpawnButton
+
+-- Credits & Notes
+local CreditsLabel = Instance.new("TextLabel")
+CreditsLabel.Size = UDim2.new(0.88, 0, 0, 20)
+CreditsLabel.Position = UDim2.new(0.06, 0, 0.84, 0)
+CreditsLabel.BackgroundTransparency = 1
+CreditsLabel.Text = "YT: ZuriScripts"
+CreditsLabel.TextColor3 = Color3.fromRGB(100, 200, 255)
+CreditsLabel.TextSize = 15
+CreditsLabel.Font = Enum.Font.GothamBold
+CreditsLabel.TextXAlignment = Enum.TextXAlignment.Center
+CreditsLabel.Parent = MainFrame
+
+local NotesLabel = Instance.new("TextLabel")
+NotesLabel.Size = UDim2.new(0.88, 0, 0, 18)
+NotesLabel.Position = UDim2.new(0.06, 0, 0.92, 0)
+NotesLabel.BackgroundTransparency = 1
+NotesLabel.Text = "Spawn any items • Case-sensitive"
+NotesLabel.TextColor3 = Color3.fromRGB(160, 160, 190)
+NotesLabel.TextSize = 13
+NotesLabel.Font = Enum.Font.Gotham
+NotesLabel.TextXAlignment = Enum.TextXAlignment.Center
+NotesLabel.Parent = MainFrame
+
+-- Draggable logic (unchanged)
+local dragging, dragInput, dragStart, startPos
+TitleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+TitleBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Minimize toggle
+local minimized = false
+MinimizeButton.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    if minimized then
+        MainFrame.Size = UDim2.new(0, 340, 0, 45)
+        ItemInput.Visible = false
+        SpawnButton.Visible = false
+        CreditsLabel.Visible = false
+        NotesLabel.Visible = false
+        MinimizeButton.Text = "+"
+    else
+        MainFrame.Size = UDim2.new(0, 340, 0, 240)
+        ItemInput.Visible = true
+        SpawnButton.Visible = true
+        CreditsLabel.Visible = true
+        NotesLabel.Visible = true
+        MinimizeButton.Text = "−"
+    end
+end)
+
+-- Hover effects
+local function hover(button, toColor, fromColor)
+    button.MouseEnter:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {BackgroundColor3 = toColor}):Play()
+    end)
+    button.MouseLeave:Connect(function()
+        TweenService:Create(button, TweenInfo.new(0.25, Enum.EasingStyle.Quad), {BackgroundColor3 = fromColor}):Play()
+    end)
+end
+
+hover(SpawnButton, Color3.fromRGB(50, 130, 255), Color3.fromRGB(30, 110, 255))
+hover(MinimizeButton, Color3.fromRGB(220, 70, 70), Color3.fromRGB(200, 50, 50))
+
+-- Spawn logic (unchanged)
+SpawnButton.MouseButton1Click:Connect(function()
+    local itemName = ItemInput.Text:match("^%s*(.-)%s*$")
+    
+    if itemName == "" or not itemName then
+        local notif = Instance.new("TextLabel")
+        notif.Size = UDim2.new(0, 220, 0, 45)
+        notif.Position = UDim2.new(0.5, -110, 0.15, 0)
+        notif.BackgroundColor3 = Color3.fromRGB(180, 40, 40)
+        notif.Text = "Enter an item name!"
+        notif.TextColor3 = Color3.new(1,1,1)
+        notif.Font = Enum.Font.GothamBold
+        notif.TextSize = 17
+        notif.Parent = ScreenGui
+        local nc = Instance.new("UICorner", notif); nc.CornerRadius = UDim.new(0,10)
+        
+        wait(2.8)
+        notif:Destroy()
+        return
+    end
+    
+    pcall(function()
+        local remotes = ReplicatedStorage:WaitForChild("Remotes", 5)
+        if remotes then
+            local shop = remotes:FindFirstChild("Shop")
+            if shop then
+                local box = shop:FindFirstChild("BoxController") or shop:FindFirstChildWhichIsA("RemoteEvent")
+                if box and box:IsA("RemoteEvent") then
+                    box:FireServer("KnifeBox4", itemName)
+                end
+            end
+        end
+    end)
+    
+    pcall(function()
+        local ProfileData = require(ReplicatedStorage.Modules.ProfileData)
+        local Weapons = ProfileData.Weapons.Owned
+        Weapons[itemName] = (Weapons[itemName] or 0) + 1
+        
+        if LocalPlayer.Character then
+            LocalPlayer.Character:BreakJoints()
+        end
+    end)
+    
+    SpawnButton.Text = "Attempted: " .. itemName
+    wait(2.5)
+    SpawnButton.Text = "Spawn Item"
+end)
+
+print("[Zuri MM2 Spawner]")
